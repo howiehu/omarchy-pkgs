@@ -1,0 +1,6 @@
+#!/bin/bash
+# The vendor's X11 helper hits BadWindow with native Wayland surfaces.
+export TYPELESS_OMARCHY_PID=$$
+export TYPELESS_OMARCHY_ACTIVE=1
+export PATH="/usr/lib/typeless-omarchy/helpers:$PATH"
+exec env -u DISPLAY /usr/bin/typeless --ozone-platform=wayland "$@"
