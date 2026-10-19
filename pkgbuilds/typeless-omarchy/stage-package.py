@@ -10,7 +10,7 @@ root = Path(__file__).resolve().parent.parent
 target = Path(sys.argv[1]).resolve()
 target.mkdir(parents=True, exist_ok=True)
 files = ["CMakeLists.txt", "src/voice.cpp", "data/typeless-voice-addon.conf",
-         "helpers/gdbus", "data/typeless.lua", "bin/typeless-omarchy",
+         "helpers/gdbus", "bin/typeless-omarchy",
          "bin/typeless-omarchy-setup", "tests/protocol.py", "tests/input-probe.py",
          "tests/native-insert.py", "tests/live-input.py", "tools/install-user.py",
          "tools/stage-package.py", "docs/validation.md", "LICENSE", "README.md"]
@@ -20,7 +20,7 @@ names = [Path(name).name for name in files]
 checksums = [hashlib.sha256((target / name).read_bytes()).hexdigest() for name in names]
 recipe = '''# Package-local compatibility sources; no vendor binary redistribution.
 pkgname=typeless-omarchy
-pkgver=0.3.1
+pkgver=0.3.2
 pkgrel=1
 pkgdesc='Fcitx5 dictation bridge and opt-in Wayland desktop integration for Typeless'
 arch=('x86_64')
@@ -39,7 +39,7 @@ recipe += '''
 prepare() {
   mkdir -p src data bin tests tools docs helpers
   cp voice.cpp src/
-  cp typeless-voice-addon.conf typeless.lua data/
+  cp typeless-voice-addon.conf data/
   cp gdbus helpers/
   cp typeless-omarchy typeless-omarchy-setup bin/
   cp protocol.py input-probe.py native-insert.py live-input.py tests/

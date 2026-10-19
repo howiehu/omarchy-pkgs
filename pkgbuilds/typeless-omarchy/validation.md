@@ -32,4 +32,4 @@ The first prototype registered a selectable `typeless-voice` input method. A new
 
 Final 0.2 verification passed GTK and cross-workspace Foot tests with `--preserve-im --shuangpin`, plus `--interleave` for actual manual Chinese before/after the voice commit. The user confirmed real mixed Shuangpin/voice use and an English-mode switch while retaining the selected method. System `fcitx5-remote -n` reported `shuangpin` while Typeless was running; its private query saw the virtual endpoint and performed no real engine capture or switch.
 
-Desktop integration floats only the exact dashboard title and recording Status overlay. It adds no tray icon, visibility controller, special workspace or background service. Official login, onboarding and tray activation remain unchanged.
+The final integration installs no window rules, tray icon or visibility service. All official window behavior is preserved.

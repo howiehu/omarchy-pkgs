@@ -4,7 +4,6 @@ import base64
 import json
 import os
 from pathlib import Path
-import shutil
 import subprocess
 import sys
 import time
@@ -42,7 +41,8 @@ if "--remove" in sys.argv:
         desktop.unlink(missing_ok=True)
     else:
         desktop.write_bytes(base64.b64decode(record["desktop_before"]))
-    config.write_text(config.read_text().replace(include, ""))
+    if config.exists() and include in config.read_text():
+        config.write_text(config.read_text().replace(include, ""))
     state.unlink()
     restart_input_method(call("CurrentInputMethod")[0])
 else:
@@ -62,8 +62,6 @@ else:
     state.write_text(json.dumps(record))
     desktop.parent.mkdir(parents=True, exist_ok=True)
     desktop.write_text(desktop_text)
-    shutil.copy2(config, state.parent / "hyprland.lua.before-package")
-    config.write_text(config.read_text() + include)
     # Discover the newly installed addon; preserve the existing methods/layout.
     restart_input_method(previous)
 subprocess.run(["update-desktop-database", str(desktop.parent)], check=True)
