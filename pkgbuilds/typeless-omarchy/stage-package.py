@@ -10,7 +10,7 @@ root = Path(__file__).resolve().parent.parent
 target = Path(sys.argv[1]).resolve()
 target.mkdir(parents=True, exist_ok=True)
 files = ["CMakeLists.txt", "src/voice.cpp", "data/typeless-voice-addon.conf",
-         "helpers/gdbus", "data/typeless.lua", "bin/typeless-omarchy",
+         "runtime/prepare.py", "tests/runtime.py", "tests/result-routing.cjs", "helpers/gdbus", "data/typeless.lua", "bin/typeless-omarchy",
          "bin/typeless-omarchy-setup", "tests/protocol.py", "tests/input-probe.py",
          "tests/native-insert.py", "tests/live-input.py", "tools/install-user.py",
          "tools/stage-package.py", "docs/validation.md", "LICENSE", "README.md"]
@@ -20,7 +20,7 @@ names = [Path(name).name for name in files]
 checksums = [hashlib.sha256((target / name).read_bytes()).hexdigest() for name in names]
 recipe = '''# Package-local compatibility sources; no vendor binary redistribution.
 pkgname=typeless-omarchy
-pkgver=0.3.4
+pkgver=0.4.0
 pkgrel=1
 pkgdesc='Fcitx5 dictation bridge and opt-in Wayland desktop integration for Typeless'
 arch=('x86_64')
@@ -37,7 +37,9 @@ recipe += "source=(" + "\n        ".join(repr(name) for name in names) + ")\n"
 recipe += "sha256sums=(" + "\n            ".join(repr(value) for value in checksums) + ")\n"
 recipe += '''
 prepare() {
-  mkdir -p src data bin tests tools docs helpers
+  mkdir -p src data bin tests tools docs helpers runtime
+  cp prepare.py runtime/
+  cp runtime.py result-routing.cjs tests/
   cp voice.cpp src/
   cp typeless-voice-addon.conf typeless.lua data/
   cp gdbus helpers/

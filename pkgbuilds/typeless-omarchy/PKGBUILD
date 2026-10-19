@@ -1,6 +1,6 @@
 # Package-local compatibility sources; no vendor binary redistribution.
 pkgname=typeless-omarchy
-pkgver=0.3.4
+pkgver=0.4.0
 pkgrel=1
 pkgdesc='Fcitx5 dictation bridge and opt-in Wayland desktop integration for Typeless'
 arch=('x86_64')
@@ -15,6 +15,9 @@ options=('!debug')
 source=('CMakeLists.txt'
         'voice.cpp'
         'typeless-voice-addon.conf'
+        'prepare.py'
+        'runtime.py'
+        'result-routing.cjs'
         'gdbus'
         'typeless.lua'
         'typeless-omarchy'
@@ -28,25 +31,30 @@ source=('CMakeLists.txt'
         'validation.md'
         'LICENSE'
         'README.md')
-sha256sums=('877e274eaaa0ed8a317e67ba6aab410a6a28d2d882f910bb35fdd67a0d179f7b'
+sha256sums=('2912704001e9d60b6ef216937fa6b7594295ff4ae3aa945e3b47a79c0a35a47f'
             'aca103232e726d3393b8e4b51179a3b6d0198baae64fdcc5af6396930ace1ffe'
             '5caf3c5350293e18dd1f7289b4ff06c17dd24fd6dd692f56ab6d5c8fa99cf180'
+            'cd8a92d0c52e73bc9fca1bcca5f5b80f43fc06fc746c5bb35769e3fe82a0a43d'
+            'e1defebf680b52bbeecd46d876a54aded8cb940f1dbb78e77831ec88f94a4b54'
+            '9fede0277e2ad58ffb3758d6d6ac38e96e2f43b6cc819a702cea45301102bf3d'
             'db21e37d1df6c173bfe47621e91aec6c60ae155b1fe7d4c32d34836cf8bbba14'
-            '779d6d83b72f13b8a8353d53dae0d0193d9e602d711a041415a6af76e30fbead'
-            '12331202672d2ca0a60b09660fa76a085675a536c631750b6eb066ba858ad2dc'
+            '141bd4502eedbb64d9b149e35111aed6c0dc1b7eb95d52a4edf368d318f6847c'
+            '86cfce7751533215b651b5ff0fcd4b39af4ceb528e7d59e81935f8c01acd730c'
             '82e3f91a848b8ba3b7c75ebfe87967bac3b0aaf63023707dee4630d3299c0c04'
             'eb3efe0e1e7605abbb167489ff871f6fbb0d2c99788bc2895b014a521b93a977'
             '1777c61d6d7421c3c7d3a312c6a5498674940b11e8d265a6b43a53d012aa5f24'
             '80cc7733793251e6a27b5775f91827b87a21d4aa79515a7593fd9dcc5a8efa9b'
             '7b40b0a22d8bda29cb3c3a761d82eef2262cb8be2b8c829d56360c43e4e49b09'
             'c7fa6604960d07fba30d7d69543a1c95d2d441450a240869c5260a622a9a06b4'
-            '39ee0222e143e013b548625fc7bf1ed4be5629bbd22cab6e9192e4ae109f2be7'
-            '32c96f0b5ddf812665dba7c5eed93cea12e69211ce1d52940ea67fdfb9e237fb'
+            '11452f127c918f74eef8e6c0268dfc20b0ab9b79721bfc19ba8fc59bcfea3b3d'
+            '942a0aa898bf76305f11e4adc4effbf94ecdf9978b9bfe9ae9290b5efca695d0'
             '40d31b3a0b377d4eb914b3a4e15a61b6fefbf383def9f40ecaa6b10b2dad9f24'
-            '7ac9ad4057c887136328576bc8346e128d0acb7e2fe80a0bca8fa0e331338536')
+            '7f9811516067f6803732328c24a5268fde20c313e183f2040581be8352cdc93d')
 
 prepare() {
-  mkdir -p src data bin tests tools docs helpers
+  mkdir -p src data bin tests tools docs helpers runtime
+  cp prepare.py runtime/
+  cp runtime.py result-routing.cjs tests/
   cp voice.cpp src/
   cp typeless-voice-addon.conf typeless.lua data/
   cp gdbus helpers/
