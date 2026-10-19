@@ -1,6 +1,6 @@
 # Package-local compatibility sources; no vendor binary redistribution.
 pkgname=typeless-omarchy
-pkgver=0.3.2
+pkgver=0.3.3
 pkgrel=1
 pkgdesc='Fcitx5 dictation bridge and opt-in Wayland desktop integration for Typeless'
 arch=('x86_64')
@@ -16,6 +16,7 @@ source=('CMakeLists.txt'
         'voice.cpp'
         'typeless-voice-addon.conf'
         'gdbus'
+        'typeless.lua'
         'typeless-omarchy'
         'typeless-omarchy-setup'
         'protocol.py'
@@ -27,26 +28,27 @@ source=('CMakeLists.txt'
         'validation.md'
         'LICENSE'
         'README.md')
-sha256sums=('5d249970f9f10ac1013be2a92e19292703bba3cd2c2bbabede915cc6c9dc5741'
+sha256sums=('316305e5b9cd9effcd9344a087fd0d578c50c0fc74d44f49ae3a5e9691b418d0'
             'aca103232e726d3393b8e4b51179a3b6d0198baae64fdcc5af6396930ace1ffe'
             '5caf3c5350293e18dd1f7289b4ff06c17dd24fd6dd692f56ab6d5c8fa99cf180'
             'db21e37d1df6c173bfe47621e91aec6c60ae155b1fe7d4c32d34836cf8bbba14'
+            'b4bc6b566b7e2c8be160c5933f3376a9b8df92cb2322861aadea44c0ff04012f'
             '12331202672d2ca0a60b09660fa76a085675a536c631750b6eb066ba858ad2dc'
-            '885339f87371cb9e0ef4d859989b56588c4170c2c8e0eedb49f1ec42e2169a86'
+            '82e3f91a848b8ba3b7c75ebfe87967bac3b0aaf63023707dee4630d3299c0c04'
             'eb3efe0e1e7605abbb167489ff871f6fbb0d2c99788bc2895b014a521b93a977'
             '1777c61d6d7421c3c7d3a312c6a5498674940b11e8d265a6b43a53d012aa5f24'
             '80cc7733793251e6a27b5775f91827b87a21d4aa79515a7593fd9dcc5a8efa9b'
             '7b40b0a22d8bda29cb3c3a761d82eef2262cb8be2b8c829d56360c43e4e49b09'
             'c7fa6604960d07fba30d7d69543a1c95d2d441450a240869c5260a622a9a06b4'
-            '5c195e6c3c4ef938a01f3d599edfcc1c04e8895ea14203860efb64fc556741de'
-            '1f9e86e326b3351694d1e4ef6a76a811061172718803eadd5b7a4f4af2bbd9de'
+            '8f693c04a6c4f5a4ec827d070a705d9e44763afdb8da4f716c8c8ed446ae66a3'
+            'ecae3e6c58bce62171b826d0f9dbf7c43c7a88a78c10992f1aab9f62d36bec31'
             '40d31b3a0b377d4eb914b3a4e15a61b6fefbf383def9f40ecaa6b10b2dad9f24'
-            'fb559541e597f67557f84181b731cf0f8efd1b8cc9a8a4ccc5760ad1abe01d5d')
+            'c5076ab8b0c5bc636669953944a5b3c027ce713e72df7a13b1f5250a418c6a82')
 
 prepare() {
   mkdir -p src data bin tests tools docs helpers
   cp voice.cpp src/
-  cp typeless-voice-addon.conf data/
+  cp typeless-voice-addon.conf typeless.lua data/
   cp gdbus helpers/
   cp typeless-omarchy typeless-omarchy-setup bin/
   cp protocol.py input-probe.py native-insert.py live-input.py tests/

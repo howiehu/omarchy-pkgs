@@ -62,6 +62,8 @@ else:
     state.write_text(json.dumps(record))
     desktop.parent.mkdir(parents=True, exist_ok=True)
     desktop.write_text(desktop_text)
+    if include not in config.read_text():
+        config.write_text(config.read_text() + include)
     # Discover the newly installed addon; preserve the existing methods/layout.
     restart_input_method(previous)
 subprocess.run(["update-desktop-database", str(desktop.parent)], check=True)
