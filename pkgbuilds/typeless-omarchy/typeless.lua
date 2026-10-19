@@ -3,6 +3,7 @@
 o.window({ class = "^Typeless$", title = "^Status$" }, {
   tag = "-default-opacity",
   float = true,
+  pin = true,
   border_size = 0,
   no_shadow = true,
   no_blur = true,

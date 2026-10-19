@@ -21,7 +21,7 @@ On Omarchy 4.0.5, Hyprland 0.56.2, Fcitx5 5.1.23 and Typeless 2.2.0-1, x86_64:
 - An isolated D-Bus/Fcitx session passed malformed JSON, wrong types, embedded NUL, invalid UTF-8, oversized and stalled-connection tests. The socket is private and accepts only the current UID.
 - The user successfully dictated and submitted a real Chinese message. With 0.2, the user also confirmed mixed manual Shuangpin/voice input and switching to English without losing the selected input method.
 - `--preserve-im --shuangpin` asserts identical real engine names before, during and after native warmup/commit. `--interleave` types Chinese through the actual keyboard/input-method path, commits voice text, then types Chinese again.
-- The transparent `Status` recording canvas receives no border, shadow, background blur or focus. Without this exact-title workaround Hyprland exposes an empty 750x500 rectangle. It is not pinned across workspaces. The official dashboard, tray, login and onboarding behavior remain unchanged.
+- The transparent `Status` recording canvas receives no border, shadow, background blur or focus. Without this exact-title workaround Hyprland exposes an empty 750x500 rectangle. Only this recording canvas is pinned across workspaces, so dictation status follows workspace changes. The official dashboard, tray, login and onboarding behavior remain unchanged.
 
 The earlier vendor application disappearance has no confirmed cause. The successful tests do not prove long-term crash freedom. Selected-text editing, surrounding-text queries and rich-text insertion are outside this prototype. The vendor may still choose its own fallback for those features. This bridge refuses password/sensitive contexts; it cannot guarantee the vendor's separate fallback behavior.
 

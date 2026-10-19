@@ -1,6 +1,6 @@
 # Package-local compatibility sources; no vendor binary redistribution.
 pkgname=typeless-omarchy
-pkgver=0.3.3
+pkgver=0.3.4
 pkgrel=1
 pkgdesc='Fcitx5 dictation bridge and opt-in Wayland desktop integration for Typeless'
 arch=('x86_64')
@@ -28,11 +28,11 @@ source=('CMakeLists.txt'
         'validation.md'
         'LICENSE'
         'README.md')
-sha256sums=('316305e5b9cd9effcd9344a087fd0d578c50c0fc74d44f49ae3a5e9691b418d0'
+sha256sums=('877e274eaaa0ed8a317e67ba6aab410a6a28d2d882f910bb35fdd67a0d179f7b'
             'aca103232e726d3393b8e4b51179a3b6d0198baae64fdcc5af6396930ace1ffe'
             '5caf3c5350293e18dd1f7289b4ff06c17dd24fd6dd692f56ab6d5c8fa99cf180'
             'db21e37d1df6c173bfe47621e91aec6c60ae155b1fe7d4c32d34836cf8bbba14'
-            'b4bc6b566b7e2c8be160c5933f3376a9b8df92cb2322861aadea44c0ff04012f'
+            '779d6d83b72f13b8a8353d53dae0d0193d9e602d711a041415a6af76e30fbead'
             '12331202672d2ca0a60b09660fa76a085675a536c631750b6eb066ba858ad2dc'
             '82e3f91a848b8ba3b7c75ebfe87967bac3b0aaf63023707dee4630d3299c0c04'
             'eb3efe0e1e7605abbb167489ff871f6fbb0d2c99788bc2895b014a521b93a977'
@@ -40,10 +40,10 @@ sha256sums=('316305e5b9cd9effcd9344a087fd0d578c50c0fc74d44f49ae3a5e9691b418d0'
             '80cc7733793251e6a27b5775f91827b87a21d4aa79515a7593fd9dcc5a8efa9b'
             '7b40b0a22d8bda29cb3c3a761d82eef2262cb8be2b8c829d56360c43e4e49b09'
             'c7fa6604960d07fba30d7d69543a1c95d2d441450a240869c5260a622a9a06b4'
-            '8f693c04a6c4f5a4ec827d070a705d9e44763afdb8da4f716c8c8ed446ae66a3'
-            'ecae3e6c58bce62171b826d0f9dbf7c43c7a88a78c10992f1aab9f62d36bec31'
+            '39ee0222e143e013b548625fc7bf1ed4be5629bbd22cab6e9192e4ae109f2be7'
+            '32c96f0b5ddf812665dba7c5eed93cea12e69211ce1d52940ea67fdfb9e237fb'
             '40d31b3a0b377d4eb914b3a4e15a61b6fefbf383def9f40ecaa6b10b2dad9f24'
-            'c5076ab8b0c5bc636669953944a5b3c027ce713e72df7a13b1f5250a418c6a82')
+            '7ac9ad4057c887136328576bc8346e128d0acb7e2fe80a0bca8fa0e331338536')
 
 prepare() {
   mkdir -p src data bin tests tools docs helpers

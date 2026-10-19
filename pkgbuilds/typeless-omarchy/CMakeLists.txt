@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(typeless-omarchy VERSION 0.3.3 LANGUAGES CXX)
+project(typeless-omarchy VERSION 0.3.4 LANGUAGES CXX)
 find_package(Fcitx5Core REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(JSONC REQUIRED IMPORTED_TARGET json-c)
