@@ -1,7 +1,5 @@
 {
   "source": "local",
   "sync": false,
-  "rebuild_on": [
-    "fcitx5"
-  ]
+  "rebuild_on": ["fcitx5"]
 }

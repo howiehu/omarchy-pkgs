@@ -1,71 +1,21 @@
-# Package-local compatibility sources; no vendor binary redistribution.
 pkgname=typeless-omarchy
-pkgver=0.4.1
+pkgver=0.4.2
 pkgrel=1
-pkgdesc='Fcitx5 dictation bridge and opt-in Wayland desktop integration for Typeless'
+pkgdesc='Fcitx5 and Wayland compatibility for Typeless on Omarchy'
 arch=('x86_64')
-url='https://github.com/omacom/omarchy-pkgs'
+url='https://github.com/howiehu/typeless-omarchy'
 license=('MIT')
 depends=('fcitx5' 'json-c' 'glib2' 'python' 'systemd' 'desktop-file-utils')
 makedepends=('cmake' 'gcc' 'pkgconf')
 checkdepends=('dbus')
-optdepends=('typeless-bin: official Typeless application (AUR)'
-            'omarchy: opt-in desktop integration')
+optdepends=('typeless-bin: separately installed official Typeless application (AUR)'
+            'omarchy: explicit per-user desktop setup')
 options=('!debug')
-source=('CMakeLists.txt'
-        'voice.cpp'
-        'typeless-voice-addon.conf'
-        'prepare.py'
-        'runtime.py'
-        'result-routing.cjs'
-        'gdbus'
-        'typeless.lua'
-        'typeless-omarchy'
-        'typeless-omarchy-setup'
-        'protocol.py'
-        'input-probe.py'
-        'native-insert.py'
-        'live-input.py'
-        'install-user.py'
-        'stage-package.py'
-        'validation.md'
-        'LICENSE'
-        'README.md')
-sha256sums=('faad2527ae61addc692afd8fa529376de64e9f3a3f6e7ef69a9608f54e80acce'
-            'aca103232e726d3393b8e4b51179a3b6d0198baae64fdcc5af6396930ace1ffe'
-            '5caf3c5350293e18dd1f7289b4ff06c17dd24fd6dd692f56ab6d5c8fa99cf180'
-            'cd8a92d0c52e73bc9fca1bcca5f5b80f43fc06fc746c5bb35769e3fe82a0a43d'
-            'e1defebf680b52bbeecd46d876a54aded8cb940f1dbb78e77831ec88f94a4b54'
-            '9fede0277e2ad58ffb3758d6d6ac38e96e2f43b6cc819a702cea45301102bf3d'
-            'db21e37d1df6c173bfe47621e91aec6c60ae155b1fe7d4c32d34836cf8bbba14'
-            '141bd4502eedbb64d9b149e35111aed6c0dc1b7eb95d52a4edf368d318f6847c'
-            'a66d7c5ab971c3b96281d7dcd5d59ec5db42f73f2fda82408bc29ca14e2013af'
-            '82e3f91a848b8ba3b7c75ebfe87967bac3b0aaf63023707dee4630d3299c0c04'
-            'eb3efe0e1e7605abbb167489ff871f6fbb0d2c99788bc2895b014a521b93a977'
-            '1777c61d6d7421c3c7d3a312c6a5498674940b11e8d265a6b43a53d012aa5f24'
-            '80cc7733793251e6a27b5775f91827b87a21d4aa79515a7593fd9dcc5a8efa9b'
-            '7b40b0a22d8bda29cb3c3a761d82eef2262cb8be2b8c829d56360c43e4e49b09'
-            'c7fa6604960d07fba30d7d69543a1c95d2d441450a240869c5260a622a9a06b4'
-            '00bae30caef585a626df9ba71bd7edce74dbdae2243d914d18c742d055744256'
-            'dfc9c01d64d8b6218bda32153d4df7c8df23b7ecf357ab13468a4395f0525eb8'
-            '40d31b3a0b377d4eb914b3a4e15a61b6fefbf383def9f40ecaa6b10b2dad9f24'
-            '9779e64e40015179d3aaf4d107b8369b4771e801f68ddad899128d921225ea13')
-
-prepare() {
-  mkdir -p src data bin tests tools docs helpers runtime
-  cp prepare.py runtime/
-  cp runtime.py result-routing.cjs tests/
-  cp voice.cpp src/
-  cp typeless-voice-addon.conf typeless.lua data/
-  cp gdbus helpers/
-  cp typeless-omarchy typeless-omarchy-setup bin/
-  cp protocol.py input-probe.py native-insert.py live-input.py tests/
-  cp install-user.py stage-package.py tools/
-  cp validation.md docs/
-}
+source=("$pkgname-$pkgver.tar.gz::$url/releases/download/v$pkgver/$pkgname-$pkgver.tar.gz")
+sha256sums=('dae16625ca72722fcaf3a8bdd16f19c49355b0e91dce93804e4f763f7d04c77b')
 
 build() {
-  cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=None
+  cmake -S "$pkgname-$pkgver" -B build -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=None
   cmake --build build
 }
 
@@ -75,5 +25,5 @@ check() {
 
 package() {
   DESTDIR="$pkgdir" cmake --install build
-  install -Dm644 README.md "$pkgdir/usr/share/doc/$pkgname/README.md"
+  install -Dm644 "$pkgname-$pkgver/README.md" "$pkgdir/usr/share/doc/$pkgname/README.md"
 }
