@@ -20,6 +20,10 @@ The launcher generates a private copy under `${XDG_CACHE_HOME:-~/.cache}/typeles
 
 Set `TYPELESS_OMARCHY_BASE_ONLY=1` when launching to bypass the runtime copy. Exit Typeless fully before switching modes because the vendor enforces a single instance. Generated cache files can be removed after exiting the app. User login, preferences and deep links use the same profile as the official application.
 
+## Scrolling redraw compatibility
+
+On the tested Wayland desktop, scrolling long official answer cards with GPU acceleration produces rectangular text displacement/flicker. The user confirmed that the same synthetic long card scrolls normally after launching only Typeless with `--disable-gpu`. The launcher therefore uses software rendering for this app by default; other applications and compositor settings are untouched. Set `TYPELESS_OMARCHY_GPU=1` before launching to re-enable the vendor's hardware rendering for comparison. Exit the existing instance first. Software rendering can use more CPU; this workaround is not a claim that every GPU/Wayland setup requires it.
+
 ## Tested
 
 On Omarchy 4.0.5, Hyprland 0.56.2, Fcitx5 5.1.23 and Typeless 2.2.0-1, x86_64:

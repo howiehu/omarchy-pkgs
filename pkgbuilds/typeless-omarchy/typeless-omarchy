@@ -9,4 +9,10 @@ if [[ ${TYPELESS_OMARCHY_BASE_ONLY:-0} != 1 ]]; then
     typeless_program=$typeless_runtime
   fi
 fi
-exec env -u DISPLAY "$typeless_program" --ozone-platform=wayland "$@"
+# Chromium 130's accelerated answer-card scrolling produces tile artifacts on
+# the tested Wayland desktop. Keep the workaround local to this application.
+typeless_render_flags=()
+if [[ ${TYPELESS_OMARCHY_GPU:-0} != 1 ]]; then
+  typeless_render_flags+=(--disable-gpu)
+fi
+exec env -u DISPLAY "$typeless_program" --ozone-platform=wayland "${typeless_render_flags[@]}" "$@"
