@@ -308,6 +308,56 @@ package_dirs() {
   done
 }
 
+# Whether a channel database's entry belongs there, by its pkgbase. Used by
+# bin/unpublish-plan to decide what may go and by bin/check-channel-drift to
+# find what should have gone, so the two cannot disagree.
+#
+# package_index_pkgbases <arch>... fills PKGBASE_RECIPE["<arch>/<pkgbase>"]
+# with the recipe that builds that pkgbase there, which is not always its
+# directory's name (pkgbuilds/yaru-icon-theme builds yaru). Unlike
+# package_pkgbase, a PKGBUILD that fails to source is an error rather than
+# its directory's name: a recipe missing from the index would read as gone.
+package_index_pkgbases() {
+  local arch pkgdir base
+  declare -gA PKGBASE_RECIPE=()
+  for arch in "$@"; do
+    while IFS= read -r pkgdir; do
+      if ! base=$(cd "$pkgdir" && env -u OMARCHY_SRC CARCH="$arch" bash -c '
+        source PKGBUILD >/dev/null 2>&1 || exit 1
+        base=${pkgbase:-${pkgname[0]:-}}
+        [[ -n $base ]] && printf "%s\n" "$base"
+      '); then
+        echo "::error::Cannot read pkgbuilds/${pkgdir##*/}/PKGBUILD for $arch" >&2
+        return 1
+      fi
+      PKGBASE_RECIPE[$arch/$base]=$pkgdir
+    done < <(package_dirs)
+  done
+}
+
+# package_pkgbase_publisher <pkgbase> <channel> <arch> prints the recipe that
+# publishes the pkgbase to that channel and architecture. When none does, it
+# prints why and fails: no recipe builds it, its recipe no longer builds for
+# that architecture (pinta is aarch64-only), or its channels leave that
+# channel out (omarchy-dev is edge-only). Needs package_index_pkgbases.
+package_pkgbase_publisher() {
+  local base="$1" channel="$2" arch="$3"
+  local pkgdir=${PKGBASE_RECIPE[$arch/$base]:-}
+
+  [[ -n $pkgdir || ! -e $PKGBUILDS_DIR/$base ]] || pkgdir=$PKGBUILDS_DIR/$base
+  if [[ -z $pkgdir ]]; then
+    echo "no recipe builds it"
+    return 1
+  elif ! package_supports_arch "$pkgdir" "$arch"; then
+    echo "pkgbuilds/${pkgdir##*/} does not build for $arch"
+    return 1
+  elif ! package_in_channel "$pkgdir" "$channel"; then
+    echo "pkgbuilds/${pkgdir##*/} leaves $channel out of its channels"
+    return 1
+  fi
+  echo "$pkgdir"
+}
+
 
 package_has_upstream_hook() {
   local pkgdir="$1"

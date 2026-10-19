@@ -35,25 +35,9 @@ for c in $channels; do
   [[ $c == edge || $c == rc || $c == stable ]] || { echo "::error::Unknown channel: $c" >&2; exit 1; }
 done
 
-# The pkgbase a recipe builds for an architecture. Unlike package_pkgbase, a
-# PKGBUILD that fails to source is an error rather than its directory's name:
-# a recipe missing from the lookup would read as gone and be retired.
-recipe_pkgbase() { # recipe_pkgbase <pkgdir> <arch>
-  (cd "$1" && env -u OMARCHY_SRC CARCH="$2" bash -c '
-    source PKGBUILD >/dev/null 2>&1 || exit 1
-    base=${pkgbase:-${pkgname[0]:-}}
-    [[ -n $base ]] && printf "%s\n" "$base"
-  ')
-}
-
-# Recipes by the pkgbase they build on each architecture.
-declare -A RECIPE=()
-for arch in "${ARCHES[@]}"; do
-  while IFS= read -r pkgdir; do
-    base=$(recipe_pkgbase "$pkgdir" "$arch") || { echo "::error::Cannot read pkgbuilds/${pkgdir##*/}/PKGBUILD for $arch; not planning anything" >&2; exit 1; }
-    RECIPE[$arch/$base]=$pkgdir
-  done < <(package_dirs)
-done
+# A recipe that cannot be read would drop out of the index, read as gone and
+# be retired, so nothing is planned.
+package_index_pkgbases "${ARCHES[@]}" || { echo "::error::Not planning anything" >&2; exit 1; }
 
 declare -A retire=()
 for p in "$@"; do
@@ -62,9 +46,7 @@ for p in "$@"; do
   for c in $channels; do
     for arch in "${ARCHES[@]}"; do
       asked=$((asked + 1))
-      pkgdir=${RECIPE[$arch/$p]:-}
-      [[ -n $pkgdir || ! -e $PKGBUILDS_DIR/$p ]] || pkgdir=$PKGBUILDS_DIR/$p
-      if [[ -n $pkgdir ]] && package_supports_arch "$pkgdir" "$arch" && package_in_channel "$pkgdir" "$c"; then
+      if pkgdir=$(package_pkgbase_publisher "$p" "$c" "$arch"); then
         echo "Keeping $p in $c/$arch: pkgbuilds/${pkgdir##*/} still publishes it there" >&2
         kept=$((kept + 1))
       else
