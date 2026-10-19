@@ -22,6 +22,8 @@ recipe "$T/pkgbuilds" icon-theme "any"
 sed -i 's/^pkgname=icon-theme$/pkgbase=icons\npkgname=(icons-light icons-dark)/' "$T/pkgbuilds/icon-theme/PKGBUILD"
 recipe "$T/pkgbuilds" carch "x86_64 aarch64"
 sed -i 's/^pkgname=carch$/if [[ $CARCH == "aarch64" ]]; then pkgname=carch-arm; else pkgname=carch; fi/' "$T/pkgbuilds/carch/PKGBUILD"
+recipe "$T/pkgbuilds" suite2 "x86_64"
+sed -i 's/^pkgname=suite2$/pkgname=(suite-a suite-b)/' "$T/pkgbuilds/suite2/PKGBUILD"
 
 entry() { # entry <channel>/<arch> <name> [pkgbase]
   mkdir -p "$T/db/$1/$2-1-1"
@@ -45,6 +47,8 @@ entry edge/x86_64 icons-light icons
 entry edge/aarch64 icons-dark icons
 entry edge/x86_64 carch
 entry edge/aarch64 carch-arm
+entry edge/x86_64 suite-a suite
+entry edge/x86_64 suite-b suite
 publish
 
 check() { # check [--base <dir>]: run against the fixtures and the recipes in $HEAD, output in $out, status in $rc
@@ -57,6 +61,7 @@ check
 (( rc == 0 )) && pass "channels that hold only what recipes publish pass" || fail "clean channels: $out"
 [[ $out != *"::error::"* ]] && pass "a recipe edge holds but rc and stable lack yet is not drift" || fail "lag reported: $out"
 [[ $out != *carch* ]] && pass "a recipe is read for each architecture as makepkg would read it" || fail "CARCH: $out"
+[[ $out != *suite* ]] && pass "packages a recipe now builds under another pkgbase are not drift" || fail "moved packages reported: $out"
 [[ $out == *"Every channel database holds only packages a recipe publishes there."* ]] || fail "clean message: $out"
 
 cp -r "$T/pkgbuilds" "$T/narrowed"
@@ -64,6 +69,28 @@ recipe "$T/narrowed" everywhere "x86_64 aarch64" '{"source": "local", "channels"
 HEAD="$T/narrowed" check --base "$T/pkgbuilds"
 (( rc == 1 )) && [[ $out == *"::error::stable/aarch64 holds everywhere"* && $out != *"Before this change"* ]] &&
   pass "a change that adds drift to clean channels fails" || fail "drift on a clean base passed: $out"
+
+cp -r "$T/pkgbuilds" "$T/renamed"
+sed -i 's/^pkgname=everywhere$/pkgname=renamed/' "$T/renamed/everywhere/PKGBUILD"
+HEAD="$T/renamed" check --base "$T/pkgbuilds"
+(( rc == 1 && $(grep -c '::error::.* holds everywhere 1-1 (built 2026-08-29): no recipe builds it' <<<"$out") == 6 )) &&
+  pass "a pkgbase renamed in its own directory leaves its old entries as drift" || fail "renamed pkgbase ($rc): $out"
+
+cp -r "$T/pkgbuilds" "$T/rebased"
+sed -i '1i pkgbase=everywhere-meta' "$T/rebased/everywhere/PKGBUILD"
+HEAD="$T/rebased" check --base "$T/pkgbuilds"
+(( rc == 0 )) && pass "a pkgbase changed in place that keeps its package's name is not drift" || fail "kept name reported ($rc): $out"
+echo '{"source": "local", "channels": ["edge"]}' > "$T/rebased/everywhere/.omarchy/package.json"
+HEAD="$T/rebased" check --base "$T/pkgbuilds"
+(( rc == 1 )) && [[ $out == *"::error::stable/x86_64 holds everywhere"* && $out != *"::error::edge/"* ]] &&
+  pass "but it is where the recipe no longer publishes that package" || fail "kept name, narrowed channels ($rc): $out"
+
+cp -r "$T/pkgbuilds" "$T/twice"
+recipe "$T/twice" everywhere-too "x86_64 aarch64"
+sed -i 's/^pkgname=everywhere-too$/pkgname=everywhere/' "$T/twice/everywhere-too/PKGBUILD"
+HEAD="$T/twice" check
+(( rc == 2 )) && [[ $out == *"pkgbuilds/everywhere and pkgbuilds/everywhere-too both build pkgbase everywhere for x86_64"* ]] &&
+  pass "two recipes building one pkgbase fail closed" || fail "duplicate pkgbase ($rc): $out"
 
 # The three ways an entry outlives its recipe.
 entry stable/x86_64 edge-only

@@ -46,6 +46,27 @@ pass "a bad package name is refused"
 plan --channels >/dev/null && fail "a bare --channels was accepted"
 pass "a bare --channels is refused"
 
+recipe renamed "x86_64 aarch64"
+sed -i 's/^pkgname=renamed$/pkgname=new-name/' "$T/pkgbuilds/renamed/PKGBUILD"
+out=$(plan --channels "stable" renamed) || fail "an old pkgbase was kept by its directory's name: $(cat "$T/err")"
+[[ $(line RETIRE_STABLE_X86_64) == renamed && $(line RETIRE_STABLE_AARCH64) == renamed ]] &&
+  pass "a pkgbase its directory no longer builds is retired" || fail "renamed plan: $out"
+plan --channels "stable" new-name >/dev/null && fail "the new pkgbase was not kept"
+pass "and the pkgbase it builds now is kept"
+rm -r "$T/pkgbuilds/renamed"
+
+recipe keep "x86_64 aarch64"
+sed -i '1i pkgbase=keep-meta' "$T/pkgbuilds/keep/PKGBUILD"
+plan --channels "edge rc stable" keep >/dev/null && fail "a pkgbase whose package is still built under another pkgbase was retired"
+pass "a pkgbase whose package a recipe still builds under another pkgbase is kept"
+rm -r "$T/pkgbuilds/keep"
+
+recipe everywhere-too "x86_64 aarch64"
+sed -i 's/^pkgname=everywhere-too$/pkgname=everywhere/' "$T/pkgbuilds/everywhere-too/PKGBUILD"
+plan --channels "stable" gone >/dev/null && fail "a plan was made although two recipes build one pkgbase"
+grep -q "both build pkgbase everywhere" "$T/err" && pass "two recipes building one pkgbase stop the plan" || fail "message: $(cat "$T/err")"
+rm -r "$T/pkgbuilds/everywhere-too"
+
 recipe broken "x86_64 aarch64"
 sed -i '1i return 1' "$T/pkgbuilds/broken/PKGBUILD"
 plan --channels "stable" gone >/dev/null && fail "a plan was made although a PKGBUILD could not be read"

@@ -314,38 +314,63 @@ package_dirs() {
 #
 # package_index_pkgbases <arch>... fills PKGBASE_RECIPE["<arch>/<pkgbase>"]
 # with the recipe that builds that pkgbase there, which is not always its
-# directory's name (pkgbuilds/yaru-icon-theme builds yaru). Unlike
-# package_pkgbase, a PKGBUILD that fails to source is an error rather than
-# its directory's name: a recipe missing from the index would read as gone.
+# directory's name (pkgbuilds/yaru-icon-theme builds yaru), and
+# PKGNAME_RECIPES["<arch>/<pkgname>"] with every recipe that builds a package
+# of that name (linux-omarchy and linux-omarchy-aarch64 both build
+# linux-omarchy). Unlike package_pkgbase, a PKGBUILD that fails to source is
+# an error rather than its directory's name, and so are two recipes building
+# one pkgbase: either would match the wrong recipe.
 package_index_pkgbases() {
-  local arch pkgdir base
-  declare -gA PKGBASE_RECIPE=()
+  local arch pkgdir built name
+  local -a lines
+  declare -gA PKGBASE_RECIPE=() PKGNAME_RECIPES=()
   for arch in "$@"; do
     while IFS= read -r pkgdir; do
-      if ! base=$(cd "$pkgdir" && env -u OMARCHY_SRC CARCH="$arch" bash -c '
+      if ! built=$(cd "$pkgdir" && env -u OMARCHY_SRC CARCH="$arch" bash -c '
         source PKGBUILD >/dev/null 2>&1 || exit 1
         base=${pkgbase:-${pkgname[0]:-}}
-        [[ -n $base ]] && printf "%s\n" "$base"
+        [[ -n $base ]] && printf "%s\n" "$base" "${pkgname[@]}"
       '); then
         echo "::error::Cannot read pkgbuilds/${pkgdir##*/}/PKGBUILD for $arch" >&2
         return 1
       fi
-      PKGBASE_RECIPE[$arch/$base]=$pkgdir
+      mapfile -t lines <<<"$built"
+      if [[ -n ${PKGBASE_RECIPE[$arch/${lines[0]}]:-} ]]; then
+        echo "::error::pkgbuilds/${PKGBASE_RECIPE[$arch/${lines[0]}]##*/} and pkgbuilds/${pkgdir##*/} both build pkgbase ${lines[0]} for $arch" >&2
+        return 1
+      fi
+      PKGBASE_RECIPE[$arch/${lines[0]}]=$pkgdir
+      for name in "${lines[@]:1}"; do
+        PKGNAME_RECIPES[$arch/$name]+="$pkgdir"$'\n'
+      done
     done < <(package_dirs)
   done
 }
 
-# package_pkgbase_publisher <pkgbase> <channel> <arch> prints the recipe that
-# publishes the pkgbase to that channel and architecture. When none does, it
-# prints why and fails: no recipe builds it, its recipe no longer builds for
-# that architecture (pinta is aarch64-only), or its channels leave that
-# channel out (omarchy-dev is edge-only). Needs package_index_pkgbases.
+# package_pkgbase_publisher <pkgbase> <channel> <arch> [<pkgname>...] prints
+# the recipe that publishes the pkgbase to that channel and architecture.
+# Only what recipes build counts, never a directory's name. A pkgbase no
+# recipe builds any more still counts while a recipe that publishes there
+# builds one of its packages (the names given, by default the pkgbase
+# itself) under another pkgbase: a promotion replaces those entries by name.
+# When none does, it prints why and fails: no recipe builds it, its recipe
+# no longer builds for that architecture (pinta is aarch64-only), or its
+# channels leave that channel out (omarchy-dev is edge-only). Needs
+# package_index_pkgbases.
 package_pkgbase_publisher() {
-  local base="$1" channel="$2" arch="$3"
-  local pkgdir=${PKGBASE_RECIPE[$arch/$base]:-}
+  local base="$1" channel="$2" arch="$3" pkgdir name
+  shift 3
+  pkgdir=${PKGBASE_RECIPE[$arch/$base]:-}
 
-  [[ -n $pkgdir || ! -e $PKGBUILDS_DIR/$base ]] || pkgdir=$PKGBUILDS_DIR/$base
   if [[ -z $pkgdir ]]; then
+    for name in "${@:-$base}"; do
+      while IFS= read -r pkgdir; do
+        if [[ -n $pkgdir ]] && package_supports_arch "$pkgdir" "$arch" && package_in_channel "$pkgdir" "$channel"; then
+          echo "$pkgdir"
+          return 0
+        fi
+      done <<<"${PKGNAME_RECIPES[$arch/$name]:-}"
+    done
     echo "no recipe builds it"
     return 1
   elif ! package_supports_arch "$pkgdir" "$arch"; then
@@ -357,7 +382,6 @@ package_pkgbase_publisher() {
   fi
   echo "$pkgdir"
 }
-
 
 package_has_upstream_hook() {
   local pkgdir="$1"
