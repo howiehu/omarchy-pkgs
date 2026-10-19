@@ -11,3 +11,6 @@ o.window({ class = "^Typeless$", title = "^Status$" }, {
   no_blur = true,
   opacity = "1 1",
 })
+
+-- Preserve the official tray and window lifecycle; only avoid dashboard tiling.
+o.window({ class = "^Typeless$", title = "^Typeless$" }, { float = true })
