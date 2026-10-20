@@ -1,5 +1,5 @@
 pkgname=typeless-omarchy
-pkgver=0.4.6
+pkgver=0.5.0
 pkgrel=1
 pkgdesc='Fcitx5 and Wayland compatibility for Typeless on Omarchy'
 arch=('x86_64')
@@ -7,12 +7,12 @@ url='https://github.com/howiehu/typeless-omarchy'
 license=('MIT')
 depends=('fcitx5' 'json-c' 'glib2' 'python' 'systemd' 'desktop-file-utils')
 makedepends=('cmake' 'gcc' 'pkgconf')
-checkdepends=('dbus' 'lua')
+checkdepends=('dbus' 'lua' 'nodejs')
 optdepends=('typeless-bin: separately installed official Typeless application (AUR)'
             'omarchy: explicit per-user desktop setup')
 options=('!debug')
 source=("$pkgname-$pkgver.tar.gz::$url/releases/download/v$pkgver/$pkgname-$pkgver.tar.gz")
-sha256sums=('9f166452ad26ef4502a23a9b26954a46d50ace442c30c5a3d9044c590ed9a4e2')
+sha256sums=('ae38ce47ce64aeb82b676c783eedc7585ec339880c6cafcd69576143352af2ac')
 
 build() {
   cmake -S "$pkgname-$pkgver" -B build -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=None
