@@ -1,5 +1,5 @@
 pkgname=typeless-omarchy
-pkgver=0.4.4
+pkgver=0.4.5
 pkgrel=1
 pkgdesc='Fcitx5 and Wayland compatibility for Typeless on Omarchy'
 arch=('x86_64')
@@ -12,7 +12,7 @@ optdepends=('typeless-bin: separately installed official Typeless application (A
             'omarchy: explicit per-user desktop setup')
 options=('!debug')
 source=("$pkgname-$pkgver.tar.gz::$url/releases/download/v$pkgver/$pkgname-$pkgver.tar.gz")
-sha256sums=('6e5df1e1c72e00a922a854bbbb84448bbe725ae0e0a20e57861e0582ad70524b')
+sha256sums=('18d807dfebecafe1771ee232b7fa9aa200c631e280d75f8c7a5004deaf560c7f')
 
 build() {
   cmake -S "$pkgname-$pkgver" -B build -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=None
